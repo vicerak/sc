@@ -1,0 +1,4 @@
+C:\MyRepos\personal\sc\sc\bin\Release\net8.0\publish\win-x64\appsettings.Development.json
+C:\MyRepos\personal\sc\sc\bin\Release\net8.0\publish\win-x64\appsettings.json
+C:\MyRepos\personal\sc\sc\bin\Release\net8.0\publish\win-x64\sc.pdb
+C:\MyRepos\personal\sc\sc\bin\Release\net8.0\publish\win-x64\sc.exe

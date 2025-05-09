@@ -1,0 +1,4 @@
+C:\MyRepos\personal\ssm\ssm\bin\Release\net8.0\publish\win-x64\appsettings.Development.json
+C:\MyRepos\personal\ssm\ssm\bin\Release\net8.0\publish\win-x64\appsettings.json
+C:\MyRepos\personal\ssm\ssm\bin\Release\net8.0\publish\win-x64\ssm.pdb
+C:\MyRepos\personal\ssm\ssm\bin\Release\net8.0\publish\win-x64\ssm.exe
