@@ -119,6 +119,7 @@ namespace sc
 #if (DEBUG)
             Debugger.Launch();
 #endif
+            Process myProcess;
             List<RestartDetails> restartDetails = new List<RestartDetails>();
             List<WorkerConfigDetails> workers = new List<WorkerConfigDetails>();
 
@@ -161,43 +162,55 @@ namespace sc
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
+
                     var restart = restartDetails.FirstOrDefault();
                     foreach (var worker in workers)
                     {
                         try
                         {
-
-                            var process = Process.GetProcessById(worker.ProcessId);
+                            myProcess = Process.GetProcessById(worker.ProcessId);
+                            await Task.Delay(TimeSpan.FromSeconds(1));
 
                         }
-                        catch (ArgumentException ex)
+                        catch(Exception ex)
                         {
-                            if (ex is ArgumentException && ex.Message.Contains($"Process with an Id of {worker.ProcessId} is not running"))
+                            if (restart?.RestartAppAutomatically == true)
                             {
-                                if (restart?.RestartAppAutomatically == true)
-                                {
-                                    _logger.LogWarning($"Process {worker.Description} with ID {worker.ProcessId} not found. Restarting...");
-                                    worker.ProcessId = StartProcess(worker?.AppPath, worker?.AppParams ?? string.Empty);
-                                    _logger.LogInformation($"Restarted {worker.Description} with Process ID: {worker.ProcessId}");
-                                }
+                                await Task.Delay(TimeSpan.FromMilliseconds(restart.RestartDelay));
+                                _logger.LogWarning($"Process {worker.Description} with ID {worker.ProcessId} not found. Restarting...");
+                                worker.ProcessId = StartProcess(worker.AppPath, worker.AppParams ?? string.Empty);
+                                _logger.LogInformation($"Restarted {worker.Description} with Process ID: {worker.ProcessId}");
+                                continue;
                             }
                             else
                             {
-                                _logger.LogError($"An error occurred while checking the process: {ex.Message}");
+                                Token.mytoken.Cancel();
+                                _logger.LogInformation("Process stopped");
+                                _logger.LogError($"An error occurred while starting the process: {ex.Message}");
+                                break; //"fileName" process stopped so service is also stopped
                             }
+
+                            
                         }
                     }
-                    await Task.Delay(1000, stoppingToken);
+                }
+                _logger.LogInformation("Service Manager is stopping...");
+
+                foreach (var worker in workers)
+                {
+                    myProcess = Process.GetProcessById(worker.ProcessId);
+                    myProcess.Kill();
+                    _logger.LogInformation($"Stopped {worker.Description} with Process ID: {worker.ProcessId}");
+                    
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred in Service Manager");
-                throw;
+                _logger.LogError($"An error occurred while stopping the process: {ex.Message}");
             }
-        }
+         }
 
+     }
         
-    }
-}
-;
+   
+};
